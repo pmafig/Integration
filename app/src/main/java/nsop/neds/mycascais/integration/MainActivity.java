@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             System.out.println("MyCascais not installed");
-            openMaketApp();
+            openMarketApp();
         }
     }
     private boolean isMyCascaisInstalled(PackageManager packageManager) {
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void openMaketApp(){
+    private void openMarketApp(){
         final String appPackageName = "com.citypoints";
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -77,10 +77,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getPackageManager().getLaunchIntentForPackage(appPackageName);
 
 
-        intent.putExtra("packagename", "nsop.neds.mycascais.integration");
-        intent.putExtra("externalappid", "15");
+        intent.putExtra("packageName", "nsop.neds.mycascais.integration");
+        intent.putExtra("externalAppId", 15);
 
         startActivityForResult(intent, PICK_CONTACT_REQUEST);
     }
-
 }
