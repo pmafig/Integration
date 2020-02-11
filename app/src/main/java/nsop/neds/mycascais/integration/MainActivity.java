@@ -8,6 +8,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,43 +21,55 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Button callButton = findViewById(R.id.externalAppCall);
+
+        Intent intent = getIntent();
+
+        String json = "";
+        Bundle bundle = intent.getExtras();
+
+        if(bundle != null && bundle.containsKey("nsop.neds.mycascais.integration.vault")) {
+            json = bundle.getString("nsop.neds.mycascais.integration.vault");
+            System.out.println(json);
+        }
+
+        if(json != null && !json.isEmpty()) {
+            TextView info = findViewById(R.id.result);
+            info.setText(json);
+        }
+
+        callButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText externalAppId = findViewById(R.id.externalAppId);
+                final String appId = externalAppId.getText().toString();
+
+                if(!appId.trim().isEmpty()) {
+                    call(appId);
+                }else{
+                    Toast.makeText(MainActivity.this, "Por favor insira um appId.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+    }
+
+    private void call(String appId){
         AccountManager accountManager = AccountManager.get(this);
         PackageManager pm = getPackageManager();
 
         if (isMyCascaisInstalled(pm)) {
             final Account availableAccounts[] = accountManager.getAccountsByType("com.MyCascais.authenticator");
 
-            if (availableAccounts.length != 0) {
-
-                String name[] = new String[availableAccounts.length];
-
-                for (int i = 0; i < availableAccounts.length; i++) {
-                    Intent intent = getIntent();
-
-                    String json = "";
-                    Bundle bundle = intent.getExtras();
-
-                    if(bundle != null && bundle.containsKey("pt.app.sampleapp.vault")) {
-                        json = bundle.getString("pt.app.sampleapp.vault");
-                    }
-
-                    if(json != null && !json.isEmpty()) {
-                        System.out.println(availableAccounts[i].name);
-                        System.out.println(availableAccounts[i].type);
-                        System.out.println(availableAccounts[i]);
-                    }else{
-                        open360App();
-                    }
-                }
-            }else{
-                open360App();
-            }
+           open360App(Integer.valueOf(appId));
 
         } else {
-            System.out.println("MyCascais not installed");
+            Toast.makeText(this, "Cascais 360 não está instalada.", Toast.LENGTH_SHORT).show();;
             openMarketApp();
         }
     }
+
     private boolean isMyCascaisInstalled(PackageManager packageManager) {
         try {
             packageManager.getPackageInfo("nsop.neds.mycascais", PackageManager.GET_ACTIVITIES);
@@ -72,14 +89,19 @@ public class MainActivity extends AppCompatActivity {
 
     static final int PICK_CONTACT_REQUEST = 1;
 
-    private void open360App(){
-        final String appPackageName = "nsop.neds.mycascais";
-        Intent intent = getPackageManager().getLaunchIntentForPackage(appPackageName);
+    private void open360App(int appId){
+        try {
+            final String appPackageName = "nsop.neds.mycascais";
+            Intent intent = getPackageManager().getLaunchIntentForPackage(appPackageName);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+            intent.putExtra("packageName", "nsop.neds.mycascais.integration");
+            intent.putExtra("externalAppId", appId);
 
-        intent.putExtra("packageName", "nsop.neds.mycascais.integration");
-        intent.putExtra("externalAppId", 15);
-
-        startActivityForResult(intent, PICK_CONTACT_REQUEST);
+            startActivityForResult(intent, PICK_CONTACT_REQUEST);
+        }catch (Exception ex){
+            TextView info = findViewById(R.id.result);
+            info.setText(ex.getMessage());
+        }
     }
 }
