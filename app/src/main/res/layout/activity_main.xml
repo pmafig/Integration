@@ -8,25 +8,11 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingHorizontal="20dp">
-        <EditText
-            android:id="@+id/externalAppId"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:cursorVisible="true"
-            android:hint="ExternalAppId"
-            android:paddingHorizontal="5dp"
-            android:paddingVertical="10dp"
-            android:drawableLeft="@drawable/ic_user"
-            android:drawablePadding="5dp"
-            android:imeOptions="actionNext"
-            android:inputType="phone"
-            android:layout_marginTop="20dp"/>
         <Button
             android:id="@+id/externalAppCall"
             android:layout_width="match_parent"
@@ -52,7 +38,6 @@
                 android:id="@+id/result"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:lines="4"
                 android:textColor="@color/colorPrimary"
                 android:text="( . . . )"/>
         </LinearLayout>

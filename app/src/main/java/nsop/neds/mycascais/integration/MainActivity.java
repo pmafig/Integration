@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.accounts.AccountManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,14 +12,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import nsop.neds.mycascais.messageencryption.MessageEncryption;
+
 public class MainActivity extends AppCompatActivity {
 
 
-    private static String PACKAGE_NAME;
+    private static String PACKAGE_NAME = "nsop.neds.mycascais.integration";
     private static String MYCASCAIS = "nsop.neds.mycascais";
     static final String packagename = "PACKAGE_NAME";
-    static final String appid = "APP_ID";
 
+    static final String appid = "APP_ID";
+    static final String webauth = "https://myqua.cascais.pt/Account/Login?appid=21&rt=9PHlCIAREWMuKD8Hr5xD1HUI6WF4+H+j8GgdymdAXPX6ie1Vuk60HyaqxJGkkNza";
+
+    static final String APP_KEY = "fc4e5f84847b4712b88f11db42fd804a";
+    static final String APP_ID = "21";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,39 +38,50 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
+        String jsonMessage = "";
         String json = "";
         Bundle bundle = intent.getExtras();
+
+        Uri appLinkData = getIntent().getData();
+
+        if(appLinkData != null){
+            json = appLinkData.getQueryParameter("tid");
+        }
 
         if(bundle != null && bundle.containsKey(PACKAGE_NAME + ".vault")) {
             json = bundle.getString(PACKAGE_NAME + ".vault");
 
-            System.out.println(json);
+            MessageEncryption enc = new MessageEncryption();
 
-            //********************************************************
-            //********* Third party application code here ************
-            //********************************************************
+            try {
+                jsonMessage = enc.Decrypt(APP_KEY, json);
+            }catch (Exception ex){
+                jsonMessage = "error: " + ex.getMessage();
+            }
+
+            System.out.println(jsonMessage);
         }
 
         if(json != null && !json.isEmpty()) {
             TextView info = findViewById(R.id.result);
-            info.setText(json);
+
+            MessageEncryption enc = new MessageEncryption();
+
+            try {
+                jsonMessage = enc.Decrypt(APP_KEY, json);
+            }catch (Exception ex){
+                jsonMessage = "error: " + ex.getMessage();
+            }
+
+            info.setText(jsonMessage);
         }
 
         callButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText externalAppId = findViewById(R.id.externalAppId);
-                final String appId = externalAppId.getText().toString();
-
-                if(!appId.trim().isEmpty()) {
-                    call(appId);
-                }else{
-                    Toast.makeText(MainActivity.this, "Por favor insira um appId.", Toast.LENGTH_SHORT).show();
-                }
+                    call(APP_ID);
             }
         });
-
-
     }
 
     private void call(String appId){
@@ -87,7 +105,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openMarketApp(){
-        Toast.makeText(this, "APP Cascais 360 não está instalada.", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(webauth));
+        startActivity(i);
     }
 
     private void open360App(int id){
