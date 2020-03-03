@@ -27,20 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingVertical="20dp">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorPrimary"
-                android:text="resultado:"
-                android:paddingVertical="10sp"/>
-            <TextView
-                android:id="@+id/result"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:textColor="@color/colorPrimary"
-                android:text="( . . . )"/>
-        </LinearLayout>
+            android:paddingVertical="20dp"/>
 
     </LinearLayout>
 
